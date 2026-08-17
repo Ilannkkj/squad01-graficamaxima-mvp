@@ -1,88 +1,69 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
-import { Chart as chartjs, LinearScale, BarElement, scales, CategoryScale, Tooltip, Legend} from "chart.js";
+import { 
+  Chart as ChartJS, 
+  LinearScale, 
+  CategoryScale, 
+  BarElement, 
+  Tooltip, 
+  Legend 
+} from "chart.js";
 
-// Chartjs = Nome no Grafico
-// BarElement = Grafico de barra
-// LinearScale = Escala linear
-//Tooltip = Visualizar quando passa o mause na barra
-chartjs.register(LinearScale,BarElement,CategoryScale, Tooltip, Legend) // Meu grafico vai usar essas duas propriedade
+// Registrar as escalas e elementos necessários do Chart.js
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-
-const vendasMensais = [   
-    // Mes eixo X e valorVnedido eixo Y
-    {mes: 1, valorVendido: 100}, // [] <= Arey
-    {mes: 2, valorVendido: 150}, // {} <= Objeto
-    {mes: 3, valorVendido: 80},
-    {mes: 4, valorVendido: 110},
-    {mes: 5, valorVendido: 200},
-    {mes: 6, valorVendido: 40}
-];
-
+// Dados simples alinhados com o array de labels
+const vendas2026 = [100, 150, 80, 110, 200, 40];
+const vendas2025 = [160, 25, 35, 60, 90, 40];
 
 const data = {
-     labels: ["Jan", "Fev", "Mar", "Abr", "maio", "junh"],
-     datasets: [ 
-        { // tudo que for sobre a barra é aqui
-        label: "Vendas 2026", // Nome do grafico
-        data: vendasMensais, // Dados que vai usar 
-        backgroundColor: "#143a80",
-        barThickness: 50,
-        borderRadius: 25,
-    
-        parsing: {
-        xAxisKey: "mes",
-        yAxisKey: "valorVendido",
-        },
-
-         animation: {
-         duration: 1200,
-         easing: "easeOutBounce"
-       }
+  labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
+  datasets: [
+    {
+      label: "Vendas 2026",
+      data: vendas2026,
+      backgroundColor: "#143a80",
+      barThickness: 30, // Ajustado para não sobrepor quando houverem 2 barras lado a lado
+      borderRadius: 15,
+      animation: {
+        duration: 1200,
+        easing: "easeOutBounce"
+      }
     },
-     {
+    {
       label: "Vendas 2025",
-      data: [160, 25, 35, 60, 90, 40,],
-      backgroundColor: " #8f9fcc",
-      borderRadius: 25,
-
-        animation: {
-         duration: 1200,
-         easing: "easeOutBounce"
-       }
+      data: vendas2025,
+      backgroundColor: "#8f9fcc",
+      barThickness: 30,
+      borderRadius: 15,
+      animation: {
+        duration: 1200,
+        easing: "easeOutBounce"
+      }
     }
-     
-]
+  ]
+};
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      grid: {
+        display: false
+      }
+    },
+    y: {
+      beginAtZero: true,
+      grid: {
+        color: "#737cd01a"
+      }
+    }
+  }
+};
+
+function Grafico() {
+  return <Bar className="grafico" data={data} options={chartOptions} />;
 }
 
-const chartOpitions = {   
-    responsive: true,
-    maintainAspectRatio: false,
-
-    scales: {
-        x:{ // linha
-          type: "category", //tipo
-          grid: { 
-          display: false,
-          }
-        },
-        y:{ //linha
-          beginAtZero: true, // começa do 0
-          grid:{ 
-          color: "#737cd01a", 
-          }
-        }
-       },
-       
-    
-        }
-
- function Grafico(){
-    return (
-  
-        <Bar className="grafico" data = {data}  options={chartOpitions}// Deta = Minhas infoemações
-         /> 
-    )
-}
-
-export default Grafico
+export default Grafico;

@@ -10,7 +10,6 @@ import CalculadoraM2 from "./Componentes/calculadoraM2";
 import "./estilo/app.css";
 
 function App() {
-  // Estado Global para controlar se o prompt da calculadora está aberto ou fechado
   const [calculadoraAberta, setCalculadoraAberta] = useState(false);
 
   return (
@@ -29,7 +28,7 @@ function App() {
         </Routes>
       </main>
 
-      {/* 🚀 BOTÃO GLOBAL FLUTUANTE (Fixo e roxo no canto da tela) */}
+
       <button 
         onClick={() => setCalculadoraAberta(!calculadoraAberta)} 
         style={{
@@ -58,13 +57,12 @@ function App() {
         🧮
       </button>
 
-      {/* 🚀 PROMPT DA CALCULADORA SUSPENSO */}
       {calculadoraAberta && (
         <div style={{
           position: 'fixed',
           bottom: '90px', 
           right: '25px',
-          width: '410px', // Um pouquinho mais larga para acomodar bem o layout escuro
+          width: '410px', 
           maxHeight: '550px',
           backgroundColor: '#fff',
           boxShadow: '0px 10px 30px rgba(0,0,0,0.3)',
@@ -73,7 +71,6 @@ function App() {
           overflowY: 'auto',
           border: '1px solid #ddd'
         }}>
-          {/* 🔥 ENCAIXE PERFEITO: Passando a prop 'aoFechar' exatamente como o componente dele espera */}
           <CalculadoraM2 aoFechar={() => setCalculadoraAberta(false)} />
         </div>
       )}

@@ -29,7 +29,7 @@ const calculoRoutes = require('./src/routes/CalculoRoutes');
 // 3. VINCULANDO AS ROTAS NO EXPRESS
 // ==========================================
 app.use('/api/orcamentos', orcamentoRoutes);
-app.use('/api/calculo', calculoRoutes); // 🚀 REPARADO: Agora no lugar certo, depois do app ser criado!
+app.use('/api/calculo', calculoRoutes); 
 app.use(configuracoesRoutes);
 // app.use('/api/auth', authRotas);
 

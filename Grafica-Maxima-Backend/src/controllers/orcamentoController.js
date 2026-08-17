@@ -1,8 +1,6 @@
-// Chama o arquivo de configuração do pacote de gerenciamento SQL (mysql2)
 const db = require('../config/db');
 const { renderOrcamentoPdf } = require('../services/orcamentoPdf.service');
 
-// 🚀 1. Arrow Function de criar orçamento
 const criarOrcamento = async (req, res) => {
     const connection = await db.getConnection();
     

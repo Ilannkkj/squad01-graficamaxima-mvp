@@ -218,7 +218,7 @@ const deletarOrcamento = async (req, res) => {
       return res.status(404).json({ error: "Orçamento não encontrado no banco." });
     }
 
-    console.log(`🗑️ Orçamento #${id} deletado do MariaDB.`);
+    console.log(`🗑️ Orçamento #${id} deletado do Banco de Dados.`);
     return res.status(200).json({ message: "Orçamento deletado com sucesso!" });
 
   } catch (error) {

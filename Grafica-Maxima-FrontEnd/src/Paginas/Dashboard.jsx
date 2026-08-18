@@ -88,7 +88,7 @@ function Dashboard() {
       </div>
 
       <div><Grafico /></div>
-      <div><UltimosOrcamentos /></div>
+      <div><UltimosOrcamentos orcamentos={orcamentos} exibirAcoes={false} /></div>
     </div>
   );
 }

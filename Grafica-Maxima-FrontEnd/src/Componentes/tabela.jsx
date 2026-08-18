@@ -2,7 +2,7 @@ import { Key } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function UltimosOrcamentos({ orcamentos = [], deletarOrcamento, prepararEdicaoOrcamento }) {
+function UltimosOrcamentos({ orcamentos = [], deletarOrcamento, prepararEdicaoOrcamento, exibirAcoes = true }) {
   const navegacao = useNavigate();
 
   function irParaStatusOrçamento(id) {
@@ -28,7 +28,7 @@ function UltimosOrcamentos({ orcamentos = [], deletarOrcamento, prepararEdicaoOr
             <th>Entrega</th>
             <th>Valor</th>
             <th>Status</th>
-            <th>Ações</th>
+            {exibirAcoes &&<th>Ações</th>}
           </tr>
         </thead>
 
@@ -70,6 +70,7 @@ function UltimosOrcamentos({ orcamentos = [], deletarOrcamento, prepararEdicaoOr
                 {/* Status */}
                 <td>{item.status}</td>
 
+                {exibirAcoes && 
                 <td>
                   <div className="botoes-acoes" style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                     <button 
@@ -96,7 +97,7 @@ function UltimosOrcamentos({ orcamentos = [], deletarOrcamento, prepararEdicaoOr
                       🗑️
                     </button>
                   </div>
-                </td>
+                </td>}
               </tr>
             );
           })}

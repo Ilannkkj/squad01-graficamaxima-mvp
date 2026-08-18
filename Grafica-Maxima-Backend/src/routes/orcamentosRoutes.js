@@ -33,6 +33,8 @@ router.get('/status-orcamento/:id', orcamentoController.obterStatusOrcamento);
 // Rota para ATUALIZAR o status do orçamento específico (PUT)
 router.put('/status-orcamento/:id', orcamentoController.atualizarStatusOrcamento);
 
+router.get('/vendas-mensais', orcamentoController.obterVendasMensais);
+
 
 // Exportação das Rotas para o sistema.
 module.exports = router;

@@ -4,6 +4,7 @@ import Card from "../Componentes/cards";
 import Grafico from "../Componentes/grafico";
 import UltimosOrcamentos from "../Componentes/tabela";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 function Dashboard() {
   const navegacao = useNavigate();
@@ -18,7 +19,7 @@ function Dashboard() {
 
   useEffect(() => {
 
-    axios.get("http://localhost:3301/api/orcamentos")
+    api.get("api/orcamentos")
       .then((resposta) => {
         setOrcamentos(resposta.data);
         setCarregando(false);

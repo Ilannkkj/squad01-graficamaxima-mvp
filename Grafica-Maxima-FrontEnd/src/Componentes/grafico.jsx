@@ -9,6 +9,7 @@ import {
   Tooltip, 
   Legend 
 } from "chart.js";
+import api from "../services/api";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -30,7 +31,7 @@ function Grafico() {
   const [vendas, setVendas] = useState(Array(12).fill(0));
 
   useEffect(() => {
-    axios.get("http://localhost:3301/api/orcamentos/vendas-mensais")
+    api.get("/orcamentos/vendas-mensais")
       .then((resposta) => {
         setVendas(resposta.data);
       })

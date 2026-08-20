@@ -31,6 +31,10 @@ function NovoOrcamento({ aberto, fechar, orcamentos, setOrcamentos, orcamentoEmE
     const [etapa, setEtapa] = useState(1);
     const [cep, setCep] = useState("");
 
+    // 🚀 ESTADOS PARA GESTÃO DE CLIENTES CADASTRADOS
+    const [clientesCadastrados, setClientesCadastrados] = useState([]);
+    const [clienteSelecionadoId, setClienteSelecionadoId] = useState("");
+
     // Estados para controlar os inputs do formulário
     const [cliente, setCliente] = useState({ nome: "", telefone: "", email: "", cpfCnpj: "" });
     const [endereco, setEndereco] = useState({ estadoCidade: "", bairro: "", ruaAvenida: "", complemento: "", empresa: false, inscricaoEstadual: "", descricao: "" });
@@ -38,33 +42,42 @@ function NovoOrcamento({ aberto, fechar, orcamentos, setOrcamentos, orcamentoEmE
     
     const [produtos, setProdutos] = useState([]);
 
+    // 🔄 CARREGAR CLIENTES DO BANCO DE DADOS
+    async function carregarClientes() {
+      try {
+        const response = await api.get("/api/clientes");
+        if (Array.isArray(response.data)) {
+          setClientesCadastrados(response.data);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar lista de clientes:", error);
+      }
+    }
+
     // 🔄 FUNÇÃO PARA CARREGAR OS ACABAMENTOS CONFIGURADOS NO BANCO
     async function carregarAcabamentosParaOrcamento() {
-    try {
-        const response = await api.get("/api/configuracoes/Geral");
-        
-        const dadosTratados = Array.isArray(response.data) ? response.data : [];
+      try {
+          const response = await api.get("/api/configuracoes/Geral");
+          
+          const dadosTratados = Array.isArray(response.data) ? response.data : [];
 
-        const acabamentosFormatados = dadosTratados.map((item, index) => {
-            // 🔥 ALINHAMENTO MILIMÉTRICO: O seu GET envia 'subCategoria'. 
-            // Se vier vazio, usamos o 'nome' ou o 'item' do banco original.
-            const nomeReal = item.subCategoria || item.sub_categoria || item.nome;
+          const acabamentosFormatados = dadosTratados.map((item, index) => {
+              const nomeReal = item.subCategoria || item.sub_categoria || item.nome;
 
-            return {
-                id: item.id || item.id_acabamento || index,
-                // Se mesmo assim não achar nome nenhum, ele mostra o ID para você saber qual registro é
-                nome: nomeReal ? String(nomeReal).trim() : `Acabamento ID #${item.id || index}`, 
-                quantidade: 0,          
-                valorUni: Number(item.custoUnitario || item.custo || 0)
-            };
-        });
+              return {
+                  id: item.id || item.id_acabamento || index,
+                  nome: nomeReal ? String(nomeReal).trim() : `Acabamento ID #${item.id || index}`, 
+                  quantidade: 0,          
+                  valorUni: Number(item.custoUnitario || item.custo || 0)
+              };
+          });
 
-        setProdutos(acabamentosFormatados);
-    } catch (error) {
-        console.error("Erro ao carregar acabamentos para a Etapa 3:", error);
-        setProdutos([]);
+          setProdutos(acabamentosFormatados);
+      } catch (error) {
+          console.error("Erro ao carregar acabamentos para a Etapa 3:", error);
+          setProdutos([]);
+      }
     }
-}
 
     useEffect(() => {
         if (orcamentoEmEdicao) {
@@ -90,14 +103,43 @@ function NovoOrcamento({ aberto, fechar, orcamentos, setOrcamentos, orcamentoEmE
             setEndereco({ estadoCidade: "", bairro: "", ruaAvenida: "", complemento: "", empresa: false, inscricaoEstadual: "", descricao: "" });
             setServico({ nome: "", entrega: "", formato: "", papel: "", cores: "", quantidade: "", descricao: "" });
             setCep("");
+            setClienteSelecionadoId("");
             setProdutos([]);
             
             if (aberto) {
                 carregarAcabamentosParaOrcamento();
+                carregarClientes(); // Carrega os clientes do MySQL ao abrir o modal
             }
         }
         setEtapa(1); 
     }, [orcamentoEmEdicao, aberto]);
+
+    // 🎯 MANIPULA A SELEÇÃO DO CLIENTE NO DROPDOWN
+    function handleSelectCliente(idSelecionado) {
+      setClienteSelecionadoId(idSelecionado);
+
+      if (idSelecionado) {
+        // Encontra o cliente na lista cadastrada
+        const clienteEncontrado = clientesCadastrados.find(
+          c => (c.id || c.id_cliente) === parseInt(idSelecionado)
+        );
+
+        if (clienteEncontrado) {
+          setCliente({
+            nome: clienteEncontrado.nome || "",
+            telefone: clienteEncontrado.telefone || "",
+            email: clienteEncontrado.email || "",
+            cpfCnpj: clienteEncontrado.cpf_cnpj || clienteEncontrado.cpfCnpj || ""
+          });
+        }
+      } else {
+        // Se selecionar "Cadastrar Novo Cliente", limpa os campos para digitação
+        setCliente({ nome: "", telefone: "", email: "", cpfCnpj: "" });
+      }
+    }
+
+    // Trava os campos se um cliente já cadastrado foi selecionado
+    const ehClienteExistente = Boolean(clienteSelecionadoId);
 
     async function finalizarOrcamento(e) {
       if (e) e.preventDefault();
@@ -233,27 +275,67 @@ function NovoOrcamento({ aberto, fechar, orcamentos, setOrcamentos, orcamentoEmE
                     <>
                         <div className="tituloebutao">
                             <div>
-                                <h2>{orcamentoEmEdicao ? "Editar Cliente / Orçamento" : "Novo Cliente"}</h2>
-                                <p>{orcamentoEmEdicao ? "Modifique os dados do orçamento selecionado" : "Preencha os dados para cadastrar um novo cliente"}</p>
+                                <h2>{orcamentoEmEdicao ? "Editar Cliente / Orçamento" : "Novo Cliente / Orçamento"}</h2>
+                                <p>{orcamentoEmEdicao ? "Modifique os dados do orçamento selecionado" : "Selecione um cliente cadastrado ou preencha para um novo cliente"}</p>
                             </div>
                             <button onClick={fechar}>Fechar</button>
                         </div>
 
                         <form onSubmit={(e) => e.preventDefault()}>
                             <div className="dados">
+                                
+                                {/* 🚀 SELETOR DE CLIENTES CADASTRADOS */}
+                                <div className="input" style={{ width: '100%', marginBottom: '15px' }}>
+                                    <label htmlFor="clienteCadastrado">Buscar Cliente Cadastrado</label>
+                                    <select 
+                                        id="clienteCadastrado"
+                                        value={clienteSelecionadoId} 
+                                        onChange={(e) => handleSelectCliente(e.target.value)}
+                                        style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}
+                                    >
+                                        <option value="">-- Cadastrar Novo Cliente --</option>
+                                        {clientesCadastrados.map(c => (
+                                            <option key={c.id || c.id_cliente} value={c.id || c.id_cliente}>
+                                                {c.nome} {c.cpf_cnpj ? `(${c.cpf_cnpj})` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 <div className="input">
                                     <label htmlFor="nome">Cliente</label>
-                                    <input type="text" placeholder="Ex.: Paulo Araújo" value={cliente.nome} onChange={(e) => setCliente({...cliente, nome: e.target.value})} />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Ex.: Paulo Araújo" 
+                                        value={cliente.nome} 
+                                        onChange={(e) => setCliente({...cliente, nome: e.target.value})} 
+                                        disabled={ehClienteExistente}
+                                        readOnly={ehClienteExistente}
+                                    />
                                 </div>
 
                                 <div className="input">
                                     <label htmlFor="telefone">Telefone</label>
-                                    <input type="tel" placeholder="Ex.: (00) 00000-0000" value={cliente.telefone} onChange={(e) => setCliente({...cliente, telefone: e.target.value})} />
+                                    <input 
+                                        type="tel" 
+                                        placeholder="Ex.: (00) 00000-0000" 
+                                        value={cliente.telefone} 
+                                        onChange={(e) => setCliente({...cliente, telefone: e.target.value})} 
+                                        disabled={ehClienteExistente}
+                                        readOnly={ehClienteExistente}
+                                    />
                                 </div>
 
                                 <div className="input">
                                     <label htmlFor="gmail">E-mail</label>
-                                    <input type="email" placeholder="Ex.: exemplo@email.com" value={cliente.email} onChange={(e) => setCliente({...cliente, email: e.target.value})} />
+                                    <input 
+                                        type="email" 
+                                        placeholder="Ex.: exemplo@email.com" 
+                                        value={cliente.email} 
+                                        onChange={(e) => setCliente({...cliente, email: e.target.value})} 
+                                        disabled={ehClienteExistente}
+                                        readOnly={ehClienteExistente}
+                                    />
                                 </div>
 
                                 <div className="input">
@@ -263,6 +345,8 @@ function NovoOrcamento({ aberto, fechar, orcamentos, setOrcamentos, orcamentoEmE
                                         placeholder="Ex.: 000.000.000-00 ou 00.000.000/0000-00" 
                                         value={cliente.cpfCnpj} 
                                         onChange={(e) => setCliente({...cliente, cpfCnpj: mascararCpfCnpj(e.target.value)})} 
+                                        disabled={ehClienteExistente}
+                                        readOnly={ehClienteExistente}
                                     />
                                 </div>
                             </div>

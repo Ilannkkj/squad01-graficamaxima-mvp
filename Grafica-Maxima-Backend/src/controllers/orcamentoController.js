@@ -147,6 +147,7 @@ const listarOrcamentos = async (req, res) => {
             FROM orcamento o
             LEFT JOIN cliente c ON o.id_cliente = c.id_cliente
             ORDER BY o.id_orcamento DESC
+            LIMIT 20
         `;
         
         const [rows] = await db.query(sql);
@@ -335,7 +336,6 @@ const gerarPdfOrcamento = async (req, res) => {
     }
 };
 
-// 🚀 NOVA FUNÇÃO: Vendas agrupadas por mês para o gráfico
 const obterVendasMensais = async (req, res) => {
     try {
         const sql = `

@@ -20,9 +20,9 @@ app.use(express.json());
 // ==========================================
 const orcamentoRoutes = require('./src/routes/orcamentosRoutes');
 const configuracoesRoutes = require('./src/routes/configuracoesRoutes'); 
+const clienteRoutes = require('./src/routes/clienteRoutes');
 // const authRotas = require('./src/routes/authRoutes');
 
-// 🚨 REPARADO: Adicionado o 'src/' no caminho para o Node encontrar o arquivo físico!
 const calculoRoutes = require('./src/routes/CalculoRoutes'); 
 
 // ==========================================
@@ -31,6 +31,7 @@ const calculoRoutes = require('./src/routes/CalculoRoutes');
 app.use('/api/orcamentos', orcamentoRoutes);
 app.use('/api/calculo', calculoRoutes); 
 app.use(configuracoesRoutes);
+app.use('/api/clientes', clienteRoutes);
 // app.use('/api/auth', authRotas);
 
 // Rota de teste padrão

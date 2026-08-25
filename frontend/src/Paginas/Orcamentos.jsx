@@ -42,9 +42,6 @@ function Orcamentos() {
       setLoading(true);
       const response = await api.get("/api/orcamentos");
       
-      // LOG TEMPORÁRIO: Abra o F12 no navegador para inspecionar o que está vindo aqui
-      console.log("Retorno da API Gráfica Máxima:", response.data);
-      
       setOrcamentos(response.data); 
     } catch (error) {
       console.error("Erro ao carregar orçamentos da API:", error);
@@ -96,15 +93,12 @@ function Orcamentos() {
           border="1px solid #feb07f"
           img="/analise.svg"
         />
-        <Card
-          titulo="Inativos"
-          valor={listaOrcamentos.filter(o => String(o.status).toLowerCase() === "inativo").length}
-          border="1px solid #ec390c"
-          img="/inativos.svg"
-        />
+        
         <Card
           titulo="Finalizados"
-          valor={listaOrcamentos.filter(o => String(o.status).toLowerCase() === "finalizado").length}
+          valor={listaOrcamentos.filter(o => {  const status = String(o.status).toLowerCase();
+            return status === "aprovado" || status === "finalizado"
+          }).length}
           border="1px solid #2d119f"
           img="/finalizados.svg"
         />
